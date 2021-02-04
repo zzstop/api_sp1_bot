@@ -26,8 +26,11 @@ def parse_homework_status(homework):
 def get_homework_statuses(current_timestamp):
     headers = {'Authorization': f'OAuth {PRAKTIKUM_TOKEN}'}
     data = {'from_date': current_timestamp}
-    homework_statuses = requests.get(API_URL, headers=headers, params=data)
-    return homework_statuses.json()
+    try:
+        homework_statuses = requests.get(API_URL, headers=headers, params=data)
+        return homework_statuses.json()
+    except Exception as e:
+        print(f'В результате запроса к API возникла ошибка {e}')
 
 
 def send_message(message, bot_client):
@@ -37,7 +40,8 @@ def send_message(message, bot_client):
 def main():
     # проинициализировать бота здесь
     bot_client = telegram.Bot(token=TELEGRAM_TOKEN)
-    current_timestamp = int(time.time())  # начальное значение timestamp
+    #current_timestamp = int(time.time())  # начальное значение timestamp
+    current_timestamp = int(0)
 
     while True:
         try:
