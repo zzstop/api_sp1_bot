@@ -43,7 +43,7 @@ def get_homework_statuses(current_timestamp):
         homework_statuses = requests.get(API_URL, headers=headers, params=data)
         return homework_statuses.json()
     except Exception as e:
-        print(f'В результате запроса к API возникла ошибка {e}')
+        logging.exception(f'В результате запроса к API возникла ошибка {e}.')
 
 
 def send_message(message, bot_client):
@@ -51,11 +51,11 @@ def send_message(message, bot_client):
 
 
 def main():
-    # проинициализировать бота здесь
     logging.debug('Bot is running!')
     bot_client = telegram.Bot(token=TELEGRAM_TOKEN)
     #current_timestamp = int(time.time())
     current_timestamp = int(0)
+    
     while True:
         try:
             new_homework = get_homework_statuses(current_timestamp)
@@ -66,7 +66,10 @@ def main():
             time.sleep(300)
 
         except Exception as e:
-            print(f'Бот столкнулся с ошибкой: {e}')
+            error_message = f'Bot faced an error: {e}.'
+            logging.exception(error_message)
+            if logging.error(error_message) == logging.exception(error_message):
+                bot_client.send_message(chat_id=CHAT_ID, text=error_message)
             time.sleep(5)
 
 
