@@ -28,14 +28,16 @@ API_URL = 'https://praktikum.yandex.ru/api/user_api/homework_statuses/'
 
 def parse_homework_status(homework):
     homework_name = homework['homework_name']
-    if homework['status'] == 'reviewing':
-        verdict = 'Работа взята в ревью.'
-    elif homework['status'] == 'rejected':
-        verdict = 'К сожалению в работе нашлись ошибки.'
-    else:
-        verdict = (
-            'Ревьюеру всё понравилось, можно приступать к следующему уроку.')
-    return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
+    homework_statuses = {
+        'reviewing': 'Работа взята в ревью.',
+        'rejected': 'К сожалению в работе нашлись ошибки.',
+        'approved': (
+            'Ревьюеру всё понравилось,'
+            ' можно приступать к следующему уроку.'),
+    }
+    for homework_status, verdict in homework_statuses.items():
+        if homework['status'] == homework_status:
+            return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
 
 
 def get_homework_statuses(current_timestamp):
@@ -52,23 +54,24 @@ def send_message(message, bot_client):
 def main():
     logging.debug('Bot is running!')
     bot_client = telegram.Bot(token=TELEGRAM_TOKEN)
-    #current_timestamp = int(time.time())
-    current_timestamp = int(0)
+    current_timestamp = int(time.time())
 
     while True:
         try:
             new_homework = get_homework_statuses(current_timestamp)
             if new_homework.get('homeworks'):
-                send_message(parse_homework_status(new_homework.get('homeworks')[0]), bot_client)
+                send_message(parse_homework_status(
+                    new_homework.get('homeworks')[0]), bot_client)
                 logging.info('Message sent!')
-            current_timestamp = new_homework.get('current_date', current_timestamp)
+            current_timestamp = new_homework.get(
+                'current_date', current_timestamp)
             time.sleep(300)
 
         except Exception as e:
-            error_message = f'Bot faced an error: {e}.'
-            logging.exception(error_message)
-            if logging.error(error_message) == logging.exception(error_message):
-                bot_client.send_message(chat_id=CHAT_ID, text=error_message)
+            e_message = f'Bot faced an error: {e}.'
+            logging.exception(e_message)
+            if logging.error(e_message) == logging.exception(e_message):
+                bot_client.send_message(chat_id=CHAT_ID, text=e_message)
             time.sleep(5)
 
 
