@@ -28,7 +28,9 @@ API_URL = 'https://praktikum.yandex.ru/api/user_api/homework_statuses/'
 
 def parse_homework_status(homework):
     homework_name = homework['homework_name']
-    if homework['status'] == 'rejected':
+    if homework['status'] == 'reviewing':
+        verdict = 'Работа взята в ревью.'
+    elif homework['status'] == 'rejected':
         verdict = 'К сожалению в работе нашлись ошибки.'
     else:
         verdict = (
@@ -39,11 +41,8 @@ def parse_homework_status(homework):
 def get_homework_statuses(current_timestamp):
     headers = {'Authorization': f'OAuth {PRAKTIKUM_TOKEN}'}
     data = {'from_date': current_timestamp}
-    try:
-        homework_statuses = requests.get(API_URL, headers=headers, params=data)
-        return homework_statuses.json()
-    except Exception as e:
-        logging.exception(f'В результате запроса к API возникла ошибка {e}.')
+    homework_statuses = requests.get(API_URL, headers=headers, params=data)
+    return homework_statuses.json()
 
 
 def send_message(message, bot_client):
@@ -55,7 +54,7 @@ def main():
     bot_client = telegram.Bot(token=TELEGRAM_TOKEN)
     #current_timestamp = int(time.time())
     current_timestamp = int(0)
-    
+
     while True:
         try:
             new_homework = get_homework_statuses(current_timestamp)
