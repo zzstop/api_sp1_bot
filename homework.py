@@ -36,8 +36,13 @@ def parse_homework_status(homework):
             'Ревьюеру всё понравилось,'
             ' можно приступать к следующему уроку.'),
     }
-    for homework_status, verdict in homework_statuses.items():
-        if homework['status'] == homework_status:
+    homework_status = homework.get('status')
+    try:
+        homework_statuses[homework_status]
+    except KeyError:
+        raise
+    for status, verdict in homework_statuses.items():
+        if homework_status == status:
             return (
                 'У вас проверили работу'
                 f' "{homework_name}"!\n\n{verdict}')
