@@ -52,10 +52,15 @@ def parse_homework_status(homework):
 
 
 def get_homework_statuses(current_timestamp):
-    headers = {'Authorization': f'OAuth {PRAKTIKUM_TOKEN}'}
-    data = {'from_date': current_timestamp}
-    homework_statuses = requests.get(
-        API_URL + API_METHOD_STATUS_URL, headers=headers, params=data)
+    request_parameters = {
+        'url': API_URL + API_METHOD_STATUS_URL,
+        'headers': {'Authorization': f'OAuth {PRAKTIKUM_TOKEN}'},
+        'params': {'from_date': current_timestamp},
+    }
+    try:
+        homework_statuses = requests.get(**request_parameters)
+    except requests.exceptions.RequestException:
+        raise
     return homework_statuses.json()
 
 
