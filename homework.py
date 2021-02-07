@@ -28,7 +28,6 @@ API_METHOD_STATUS_URL = 'homework_statuses/'
 
 
 def parse_homework_status(homework):
-    homework_name = homework.get('homework_name')
     homework_statuses = {
         'reviewing': 'Работа взята в ревью.',
         'rejected': 'К сожалению в работе нашлись ошибки.',
@@ -36,7 +35,11 @@ def parse_homework_status(homework):
             'Ревьюеру всё понравилось,'
             ' можно приступать к следующему уроку.'),
     }
-    homework_status = homework.get('status')
+    try:
+        homework_name = homework['homework_name']
+        homework_status = homework['status']
+    except KeyError:
+        raise
     try:
         homework_statuses[homework_status]
     except KeyError:
