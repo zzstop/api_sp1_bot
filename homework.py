@@ -6,6 +6,7 @@ from logging.handlers import RotatingFileHandler
 import requests
 import telegram
 from dotenv import load_dotenv
+from requests.exceptions import RequestException
 
 load_dotenv()
 
@@ -59,7 +60,11 @@ def get_homework_statuses(current_timestamp):
     }
     try:
         homework_statuses = requests.get(**request_parameters)
-    except requests.exceptions.RequestException:
+    except ConnectionAbortedError:
+        raise
+    except ConnectionRefusedError:
+        raise
+    except RequestException:
         raise
     return homework_statuses.json()
 
@@ -72,8 +77,7 @@ def send_message(message, bot_client):
 def main():
     logging.debug('Bot is running!')
     bot_client = telegram.Bot(token=TELEGRAM_TOKEN)
-    #current_timestamp = int(time.time())
-    current_timestamp = int(0)
+    current_timestamp = int(time.time())
     while True:
         try:
             new_homework = get_homework_statuses(current_timestamp)
