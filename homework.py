@@ -74,7 +74,7 @@ def main():
                 send_message(parse_homework_status(
                     existing_homeworks[0]), bot_client)
             current_timestamp = new_homework.get(
-                'current_date', current_timestamp)
+                'current_date', int(time.time()))
             time.sleep(300)
 
         except Exception as e:
