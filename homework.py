@@ -68,9 +68,9 @@ def main():
     while True:
         try:
             new_homework = get_homework_statuses(current_timestamp)
-            if new_homework.get('homeworks'):
-                send_message(parse_homework_status(
-                    new_homework.get('homeworks')[0]), bot_client)
+            homeworks = new_homework.get('homeworks')
+            if homeworks:
+                send_message(parse_homework_status(homeworks[0]), bot_client)
                 logging.info('Message sent!')
             current_timestamp = new_homework.get(
                 'current_date', current_timestamp)
