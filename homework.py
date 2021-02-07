@@ -57,6 +57,7 @@ def get_homework_statuses(current_timestamp):
 
 
 def send_message(message, bot_client):
+    logging.info('Message sent!')
     return bot_client.send_message(chat_id=CHAT_ID, text=message)
 
 
@@ -68,10 +69,10 @@ def main():
     while True:
         try:
             new_homework = get_homework_statuses(current_timestamp)
-            homeworks = new_homework.get('homeworks')
-            if homeworks:
-                send_message(parse_homework_status(homeworks[0]), bot_client)
-                logging.info('Message sent!')
+            existing_homeworks = new_homework.get('homeworks')
+            if existing_homeworks:
+                send_message(parse_homework_status(
+                    existing_homeworks[0]), bot_client)
             current_timestamp = new_homework.get(
                 'current_date', current_timestamp)
             time.sleep(300)
@@ -81,7 +82,6 @@ def main():
             logging.exception(e_message)
             if logging.error(e_message) == logging.exception(e_message):
                 bot_client.send_message(chat_id=CHAT_ID, text=e_message)
-                logging.info('Message sent!')
             time.sleep(5)
 
 
