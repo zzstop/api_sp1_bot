@@ -39,17 +39,17 @@ def parse_homework_status(homework):
     try:
         homework_name = homework['homework_name']
         homework_status = homework['status']
-    except KeyError:
-        raise
+    except KeyError as e:
+        e_message = f'API return incorrect key: {e}.'
+        logging.exception(e_message)
+        raise KeyError(e_message)
     try:
-        homework_statuses[homework_status]
+        verdict = homework_statuses[homework_status]
     except KeyError:
-        raise
-    for status, verdict in homework_statuses.items():
-        if homework_status == status:
-            return (
-                'У вас проверили работу'
-                f' "{homework_name}"!\n\n{verdict}')
+        e_message = 'Response from server contain incorrect status.'
+        logging.exception(e_message)
+        raise ValueError(e_message)
+    return (f'У вас проверили работу "{homework_name}"!\n\n{verdict}')
 
 
 def get_homework_statuses(current_timestamp):
@@ -78,6 +78,7 @@ def main():
     logging.debug('Bot is running!')
     bot_client = telegram.Bot(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
+
     while True:
         try:
             new_homework = get_homework_statuses(current_timestamp)
