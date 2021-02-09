@@ -72,7 +72,10 @@ def get_homework_statuses(current_timestamp):
         e_message = f'Connection refused, error: {e}.'
         logging.exception(e_message)
         raise ConnectionRefusedError(e_message)
-    return homework_statuses.json()
+    parsed_homework_statuses = homework_statuses.json()
+    if isinstance(parsed_homework_statuses, dict):
+        return parsed_homework_statuses
+    return dict()
 
 
 def send_message(message, bot_client):
@@ -83,8 +86,8 @@ def send_message(message, bot_client):
 def main():
     logging.debug('Bot is running!')
     bot_client = telegram.Bot(token=TELEGRAM_TOKEN)
-    #current_timestamp = int(time.time())
-    current_timestamp = int(0)
+    current_timestamp = int(time.time())
+
     while True:
         try:
             new_homework = get_homework_statuses(current_timestamp)
